@@ -407,4 +407,4 @@ Future<void> _activateArMode() async {
   );
 }
 }
-//comentario de mierda solo para ver si sube git o no 
+//

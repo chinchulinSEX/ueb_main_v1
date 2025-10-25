@@ -1,7 +1,5 @@
 // =====================================================
-// 📊 AR HUD OVERLAY
-// =====================================================
-// Información de navegación en pantalla
+// 📊 AR HUD OVERLAY (compacto) — FIX baseline
 // =====================================================
 
 import 'package:flutter/material.dart';
@@ -33,14 +31,9 @@ class ArHudOverlay extends StatelessWidget {
     return SafeArea(
       child: Column(
         children: [
-          const SizedBox(height: 60), // Espacio para botones
-
-          // 🎯 Panel principal de información
+          const SizedBox(height: 60),
           _buildMainInfoPanel(context),
-
           const Spacer(),
-
-          // 📍 Panel inferior con detalles
           _buildBottomPanel(),
         ],
       ),
@@ -48,41 +41,47 @@ class ArHudOverlay extends StatelessWidget {
   }
 
   Widget _buildMainInfoPanel(BuildContext context) {
+    const double hMargin = 12;
+    const double pad = 10;
+    const double radius = 12;
+    const double titleSize = 14;
+    const double numberSize = 28;
+    const double unitSize = 14;
+    const double waypointSize = 12;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: hMargin),
+      padding: const EdgeInsets.all(pad),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.black.withOpacity(0.8),
-            Colors.black.withOpacity(0.6),
+            Colors.black.withOpacity(0.80),
+            Colors.black.withOpacity(0.60),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(radius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            blurRadius: 20,
-            spreadRadius: 5,
+            color: Colors.black.withOpacity(0.35),
+            blurRadius: 12,
+            spreadRadius: 2,
           ),
         ],
       ),
       child: Column(
         children: [
-          // Destino
           Text(
             targetName,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 18,
+              fontSize: titleSize,
               fontWeight: FontWeight.bold,
             ),
-            textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 8),
 
-          const SizedBox(height: 16),
-
-          // Distancia al siguiente waypoint
+          // ✅ FIX: baseline correcto
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -94,35 +93,30 @@ class ArHudOverlay extends StatelessWidget {
                     : (distanceToNext / 1000).toStringAsFixed(1),
                 style: const TextStyle(
                   color: Colors.red,
-                  fontSize: 48,
+                  fontSize: numberSize,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Text(
                 distanceToNext < 1000 ? 'm' : 'km',
                 style: const TextStyle(
                   color: Colors.white70,
-                  fontSize: 24,
+                  fontSize: unitSize,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 8),
-
-          // Waypoint actual
+          const SizedBox(height: 6),
           Text(
             'Punto $currentWaypoint de $totalWaypoints',
             style: const TextStyle(
               color: Colors.white70,
-              fontSize: 14,
+              fontSize: waypointSize,
             ),
           ),
-
-          const SizedBox(height: 12),
-
-          // Barra de progreso
+          const SizedBox(height: 6),
           _buildProgressBar(),
         ],
       ),
@@ -130,7 +124,9 @@ class ArHudOverlay extends StatelessWidget {
   }
 
   Widget _buildProgressBar() {
-    final progress = currentWaypoint / totalWaypoints;
+    final progress = (totalWaypoints == 0)
+        ? 0.0
+        : (currentWaypoint / totalWaypoints).clamp(0.0, 1.0);
 
     return Column(
       children: [
@@ -138,17 +134,17 @@ class ArHudOverlay extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           child: LinearProgressIndicator(
             value: progress,
-            minHeight: 8,
+            minHeight: 4,
             backgroundColor: Colors.white24,
             valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           '${(progress * 100).toStringAsFixed(0)}% completado',
           style: const TextStyle(
             color: Colors.white54,
-            fontSize: 12,
+            fontSize: 10,
           ),
         ),
       ],
@@ -157,25 +153,21 @@ class ArHudOverlay extends StatelessWidget {
 
   Widget _buildBottomPanel() {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(30),
+        color: Colors.black.withOpacity(0.70),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Velocidad
           _buildInfoChip(
             icon: Icons.speed,
             label: '${(speed * 3.6).toStringAsFixed(1)} km/h',
             color: Colors.blue,
           ),
-
-          const SizedBox(width: 16),
-
-          // Distancia total
+          const SizedBox(width: 10),
           _buildInfoChip(
             icon: Icons.route,
             label: totalDistance < 1000
@@ -183,10 +175,7 @@ class ArHudOverlay extends StatelessWidget {
                 : '${(totalDistance / 1000).toStringAsFixed(1)} km',
             color: Colors.orange,
           ),
-
-          const SizedBox(width: 16),
-
-          // Estado de calibración
+          const SizedBox(width: 10),
           _buildInfoChip(
             icon: isCalibrated ? Icons.check_circle : Icons.warning_amber,
             label: isCalibrated ? 'OK' : 'Calibrar',
@@ -205,13 +194,13 @@ class ArHudOverlay extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: color, size: 18),
+        Icon(icon, color: color, size: 16),
         const SizedBox(width: 4),
         Text(
           label,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -219,3 +208,4 @@ class ArHudOverlay extends StatelessWidget {
     );
   }
 }
+
