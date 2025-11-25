@@ -1,12 +1,26 @@
+/*
+CAMBIOS REALIZADOS:
+1. namespace = "com.suelo.y.agua.prototype"
+   → Para que el proyecto Flutter tenga un identificador propio y no herede el viejo.
+
+2. applicationId = "com.suelo.y.agua.prototype"
+   → ESTE es el ID real de Android. Con esto Android reconoce esta app como NUEVA.
+   → No reemplaza la anterior, no la borra, no la toca.
+
+TODO LO DEMÁS LO DEJÉ IGUAL.
+*/
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
-    namespace = "com.example.ubicatec_unificado"
+
+    // CAMBIADO: nuevo namespace único para este proyecto
+    namespace = "com.suelo.y.agua.prototype"
+
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -20,14 +34,18 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.ubicatec_unificado"
+
+        // CAMBIADO: nuevo applicationId → evita reemplazar la app vieja
+        applicationId = "com.suelo.y.agua.prototype"
+
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
-        // ✅ Pasa el token leído del .env al Manifest
-        manifestPlaceholders["MAPBOX_ACCESS_TOKEN"] = project.findProperty("MAPBOX_ACCESS_TOKEN") ?: ""
+        // Token de Mapbox
+        manifestPlaceholders["MAPBOX_ACCESS_TOKEN"] =
+            project.findProperty("MAPBOX_ACCESS_TOKEN") ?: ""
     }
 
     buildTypes {
@@ -41,7 +59,7 @@ flutter {
     source = "../.."
 }
 
-// ✅ Carga el token desde .env automáticamente
+// Carga automática del token desde .env
 val dotenvFile = rootProject.file(".env")
 if (dotenvFile.exists()) {
     dotenvFile.readLines().forEach { line ->

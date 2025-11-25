@@ -1,4 +1,4 @@
-package com.example.ubicatec_unificado
+package com.suelo.y.agua.prototype
 
 import io.flutter.embedding.android.FlutterActivity
 

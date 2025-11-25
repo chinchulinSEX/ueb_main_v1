@@ -1,6 +1,5 @@
-// file: lib/splash_page.dart
 import 'package:flutter/material.dart';
-import 'login_new.dart'; // ✅ Cambiado: redirige al login
+import 'login_new.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -12,8 +11,8 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _slideAnimation;
-  late Animation<double> _fadeAnimation;
+  late Animation<double> _fade;
+  late Animation<double> _scale;
 
   @override
   void initState() {
@@ -24,18 +23,18 @@ class _SplashPageState extends State<SplashPage>
       duration: const Duration(seconds: 3),
     );
 
-    _slideAnimation = Tween<double>(begin: -1.5, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+    _fade = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+    _scale = Tween<double>(begin: 0.75, end: 1.15).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
 
     _controller.forward();
 
-    // 👇 Espera 4s y redirige al LOGIN
+    // Después del splash → ir al login
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -54,68 +53,33 @@ class _SplashPageState extends State<SplashPage>
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    const azulAgua = Color(0xFF1565C0);
+    const celesteGota = Color(0xFF29B6F6);
+    const verdeHoja = Color(0xFF4CAF50);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Fondo blanco
-          Container(color: Colors.white),
-
-          // Fondo rojo deslizándose en diagonal
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(_slideAnimation.value * screenWidth, 0),
-                child: ClipPath(
-                  clipper: DiagonalClipper(),
-                  child: Container(color: Colors.red.shade700),
-                ),
-              );
-            },
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [azulAgua, celesteGota, verdeHoja],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-
-          // Texto "UBICATEC"
-          Center(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: const Text(
-                'UBICATEC',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 70,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 4,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black26,
-                      offset: Offset(2, 2),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
+        ),
+        child: Center(
+          child: FadeTransition(
+            opacity: _fade,
+            child: ScaleTransition(
+              scale: _scale,
+              child: Image.asset(
+                'assets/icons/logo_suelo_y_agua_real-removebg-preview.png',
+                height: 240, // 🔥 imagen grande
+                fit: BoxFit.contain,
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
-}
-
-// 🔺 Diagonal tipo Yango
-class DiagonalClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(size.width * 0.7, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

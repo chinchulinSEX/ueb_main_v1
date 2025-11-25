@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.ubicatec_unificado">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.suelo.y.agua.prototype">
 
     <!-- 🌐 Permisos principales -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -8,32 +8,32 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <!-- 🆕 permite navegación activa en segundo plano -->
 
     <!-- 📸 Cámara y micrófono -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- 🖼️ Permisos de medios (Android 13+) -->
+    <!-- 🖼️ Permisos Android 13+ -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
-    <!-- 📷 Características de hardware -->
+    <!-- 📷 Características -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
-    <!-- 🆕 brújula -->
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
-    <!-- 🆕 GPS explícito -->
 
-    <!-- 🧭 ARCore (opcional) -->
+    <!-- 🧭 ARCore opcional -->
     <uses-feature android:name="android.hardware.camera.ar" android:required="false" />
     <meta-data android:name="com.google.ar.core" android:value="optional" />
 
-    <application android:label="ubicatec_unificado" android:name="${applicationName}" android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
+    <!-- ========================================= -->
+    <!--        NO PONGAS COMENTARIOS AQUÍ         -->
+    <!-- ========================================= -->
+    <application android:label="SUELO Y AGUA Prototipo" android:name="${applicationName}" android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
 
-        <!-- 🔑 Claves -->
+        <!-- 🔑 API Keys -->
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBvOkBw3cTCLdD05Hm5ZXobeT6sPcSHEqQ" />
 
         <meta-data android:name="com.mapbox.token" android:value="pk.eyJ1IjoibW9pc2VzZGV2IiwiYSI6ImNtZ2Vpa3ZrODF0dGQybHExMWpuY3pzeGoifQ.QtOZW1JZ_zCIL9wiexlS8Q" />
@@ -58,4 +58,5 @@
             <data android:mimeType="text/plain" />
         </intent>
     </queries>
+
 </manifest>

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart'; // ✅ Usa import RELATIVO (no de paquete)
+import 'home_page.dart';
 
 class LoginNewPage extends StatefulWidget {
   const LoginNewPage({super.key});
@@ -17,116 +17,107 @@ class _LoginNewPageState extends State<LoginNewPage> {
     if (_formKey.currentState!.validate()) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomePage()), // ✅ ahora sí reconoce
+        MaterialPageRoute(builder: (_) => const HomePage()),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const Color rojoPrincipal = Color(0xFFD32F2F);
+    // Colores institucionales
+    const Color azulAgua = Color(0xFF1565C0);
+    const Color verdeHoja = Color(0xFF4CAF50);
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text(
-          'UBICATEC',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: rojoPrincipal,
-        foregroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Bienvenido a UBICATEC 👋',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: rojoPrincipal,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 40),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(28),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // 🔥 LOGO GRANDE
+                Image.asset(
+                  'assets/icons/logo_suelo_y_agua_real-removebg-preview.png',
+                  height: 180,
+                  fit: BoxFit.contain,
+                ),
 
-                  // Campo nombre
-                  TextFormField(
-                    controller: _nameCtrl,
-                    decoration: InputDecoration(
-                      labelText: 'Nombre (por defecto: Visitante)',
-                      labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: rojoPrincipal, width: 2),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                const SizedBox(height: 45),
+
+                // 📝 CAMPO NOMBRE
+                TextFormField(
+                  controller: _nameCtrl,
+                  style: const TextStyle(color: Colors.black), // 🔥 TEXTO NEGRO
+                  decoration: InputDecoration(
+                    labelText: "Nombre (opcional)",
+                    labelStyle: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                    prefixIcon: const Icon(Icons.person, color: azulAgua),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: azulAgua, width: 2),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                ),
 
-                  // Campo teléfono
-                  TextFormField(
-                    controller: _phoneCtrl,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: 'Número de teléfono',
-                      labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: rojoPrincipal, width: 2),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                const SizedBox(height: 22),
+
+                // 📞 CAMPO TELÉFONO
+                TextFormField(
+                  controller: _phoneCtrl,
+                  style: const TextStyle(color: Colors.black), // 🔥 TEXTO NEGRO
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: "Número de teléfono",
+                    labelStyle: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ingresa tu teléfono';
-                      }
-                      return null;
-                    },
+                    prefixIcon: const Icon(Icons.phone, color: verdeHoja),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: verdeHoja, width: 2),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Ingresa tu teléfono" : null,
+                ),
 
-                  const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-                  // Botón continuar
-                  FilledButton(
+                // 🔵 BOTÓN CONTINUAR
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
                     onPressed: _continue,
                     style: FilledButton.styleFrom(
-                      backgroundColor: rojoPrincipal,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 60,
-                        vertical: 16,
-                      ),
+                      backgroundColor: azulAgua,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      shadowColor: rojoPrincipal.withOpacity(0.5), // 🔧 .withOpacity está bien aquí
-                      elevation: 6,
+                      elevation: 4,
                     ),
                     child: const Text(
-                      'CONTINUAR',
+                      "CONTINUAR",
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
+                        letterSpacing: 1.3,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
