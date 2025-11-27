@@ -4,11 +4,12 @@
 
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'ar_navigation_3d.dart';
 
@@ -232,8 +233,27 @@ class _MapNavigationPageState extends State<MapNavigationPage> {
 
     _routeManager = await map!.annotations.createPolylineAnnotationManager();
 
+    // 📍 Obtener tu ubicación
     _currentPos = await gl.Geolocator.getCurrentPosition();
+
+    // 🛣 Dibujar ruta desde tu ubicación → destino
     await _dibujarRuta();
+
+    // ⭐ AUTO ZOOM / AUTO FOCUS HACIA EL DESTINO
+    await map!.flyTo(
+      mp.CameraOptions(
+        center: mp.Point(
+          coordinates: mp.Position(
+            widget.destLon,
+            widget.destLat,
+          ),
+        ),
+        zoom: 15.5,
+        pitch: 45,
+        bearing: 0,
+      ),
+      mp.MapAnimationOptions(duration: 1500),
+    );
 
     setState(() => _loading = false);
   }

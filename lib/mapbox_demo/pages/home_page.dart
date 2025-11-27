@@ -5,6 +5,7 @@
 // ============================================
 
 import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -12,10 +13,8 @@ import 'package:geolocator/geolocator.dart' as gl;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
 import 'package:permission_handler/permission_handler.dart';
 
-import 'filtracion.dart';
 import 'map_navigation.dart';
-
-
+import 'filtracion.dart';
 
 // 🎨 Colores corporativos
 const azulAgua = Color(0xFF1565C0);
@@ -153,7 +152,8 @@ class _HomePageState extends State<HomePage> {
               child: FloatingActionButton(
                 heroTag: "open_cam",
                 backgroundColor: celesteGota,
-                child: const Icon(Icons.camera_alt, size: 30, color: Colors.white),
+                child:
+                    const Icon(Icons.camera_alt, size: 30, color: Colors.white),
                 onPressed: () => _toggleCamera(true),
               ),
             ),
@@ -167,7 +167,8 @@ class _HomePageState extends State<HomePage> {
             child: FloatingActionButton(
               heroTag: "my_loc",
               backgroundColor: verdeHoja,
-              child: const Icon(Icons.my_location, color: Colors.white, size: 28),
+              child:
+                  const Icon(Icons.my_location, color: Colors.white, size: 28),
               onPressed: _goToMyLocation,
             ),
           ),
@@ -224,7 +225,7 @@ class _HomePageState extends State<HomePage> {
             if (index == 1) {
               final lugar = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const FiltracionPage()),
+                MaterialPageRoute(builder: (_) => FiltracionPage()), // ✅ Correcto
               );
               if (lugar != null) _mostrarSoloLugar(lugar);
             }
@@ -373,7 +374,7 @@ class _HomePageState extends State<HomePage> {
   // =====================================================
   // 📍 UBICACIÓN Y PERMISOS
   // =====================================================
-  Future<void> _setupPositionTracking() async {  
+  Future<void> _setupPositionTracking() async {
     await _checkAndRequestLocationPermission();
 
     userPositionStream?.cancel();

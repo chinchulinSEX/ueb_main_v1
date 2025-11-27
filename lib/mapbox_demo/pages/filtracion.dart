@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'lugares_ueb.dart';
+import 'lugaresCliente.dart';
+import 'MapPreviewPage.dart'; // 👈 mantiene tu flujo
 
 class FiltracionPage extends StatefulWidget {
   const FiltracionPage({super.key});
@@ -10,192 +11,213 @@ class FiltracionPage extends StatefulWidget {
 
 class _FiltracionPageState extends State<FiltracionPage> {
   final TextEditingController _searchController = TextEditingController();
-  String filtroSeleccionado = "Todos";
 
-  final List<Map<String, dynamic>> lugares = lugaresUeb;
+  String filtroPais = "Todos";
+  String filtroDepto = "Todos";
 
-  // 🎨 Colores corporativos Suelo & Agua
-  static const Color azulAgua = Color(0xFF1565C0);
-  static const Color celesteGota = Color(0xFF29B6F6);
-  static const Color verdeHoja = Color(0xFF4CAF50);
-  static const Color marronSuelo = Color(0xFF6D4C41);
+  late List<Map<String, dynamic>> _resultados;
 
-  // 🏷️ Categorías personalizadas
-  final List<String> categorias = [
-    "Todos",
-    "Zonas Agrícolas",
-    "Laboratorios",
-    "Aulas",
-    "Servicios UEB",
-    "Comedor / Cafetería",
-    "Administración",
-    "Entradas y Salidas",
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _resultados = lugaresCliente;
+  }
+
+  void _filtrarTodo() {
+    setState(() {
+      _resultados = lugaresCliente.where((lugar) {
+        bool coincideBusqueda = lugar['nombre']
+            .toString()
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase());
+
+        bool coincidePais = filtroPais == "Todos" || lugar['pais'] == filtroPais;
+        bool coincideDepto = filtroDepto == "Todos" || lugar['departamento'] == filtroDepto;
+
+        return coincideBusqueda && coincidePais && coincideDepto;
+      }).toList();
+    });
+  }
+
+  List<String> obtenerDeptos(String pais) {
+    if (pais == "Todos") return ["Todos"];
+    return [
+      "Todos",
+      ...lugaresCliente
+          .where((l) => l['pais'] == pais)
+          .map((l) => l['departamento'])
+          .toSet()
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    final query = _searchController.text.toLowerCase();
-
-    final lugaresFiltrados = lugares.where((l) {
-      final matchTexto = l["nombre"].toLowerCase().contains(query);
-      final matchCategoria =
-          filtroSeleccionado == "Todos" ? true : l["categoria"] == filtroSeleccionado;
-      return matchTexto && matchCategoria;
-    }).toList();
+    final departamentos = obtenerDeptos(filtroPais);
 
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
-        backgroundColor: azulAgua,
+        backgroundColor: const Color(0xFF1565C0),
         title: const Text(
-          "Buscar puntos - Suelo & Agua",
+          'Ambientes Agrícolas',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
-
-      // ⭐⭐⭐ BOTÓN FIJO, BLANCO, Y SEGURO DEL MENÚ DEL TELÉFONO ⭐⭐⭐
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.all(14),
-        child: SizedBox(
-          width: double.infinity,
-          height: 60,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,       // BLANCO
-              foregroundColor: azulAgua,           // AZUL
-              elevation: 6,
-              shadowColor: Colors.black54,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-                side: const BorderSide(color: azulAgua, width: 2),
-              ),
-            ),
-            onPressed: () => Navigator.pop(context, {"mostrarTodos": true}),
-            icon: const Icon(Icons.map, size: 26),
-            label: const Text(
-              "Mostrar todos los puntos",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      ),
-
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔍 Buscador
-          Container(
-            margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: celesteGota.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(14),
-            ),
+          // ------------------------- BUSCADOR -------------------------
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
-              onChanged: (_) => setState(() {}),
-              style: const TextStyle(color: Colors.black),
-              decoration: const InputDecoration(
-                hintText: "Buscar zonas, puntos o laboratorios...",
-                hintStyle: TextStyle(color: Colors.black54),
-                border: InputBorder.none,
-                icon: Icon(Icons.search, color: azulAgua),
+              onChanged: (v) => _filtrarTodo(),
+              decoration: InputDecoration(
+                hintText: 'Buscar ambientes, lotes o fincas...',
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF1565C0)),
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ),
 
-          // 🏷️ Chips de Categorías
-          SizedBox(
-            height: 45,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              children: categorias.map((cat) {
-                final activo = filtroSeleccionado == cat;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: ChoiceChip(
-                    label: Text(cat),
-                    selected: activo,
-                    onSelected: (_) => setState(() => filtroSeleccionado = cat),
-                    selectedColor: azulAgua,
-                    labelStyle: TextStyle(
-                      color: activo ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    backgroundColor: Colors.white,
-                    side: const BorderSide(color: azulAgua),
-                  ),
-                );
-              }).toList(),
+          // ------------------------- FILTROS -------------------------
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                _chip("Todos", filtroPais, (v) {
+                  filtroPais = v;
+                  filtroDepto = "Todos";
+                  _filtrarTodo();
+                }, colorOn: Colors.green),
+
+                const SizedBox(width: 8),
+                _chip("Bolivia", filtroPais, (v) {
+                  filtroPais = v;
+                  filtroDepto = "Todos";
+                  _filtrarTodo();
+                }),
+
+                const SizedBox(width: 8),
+                _chip("Brasil", filtroPais, (v) {
+                  filtroPais = v;
+                  filtroDepto = "Todos";
+                  _filtrarTodo();
+                }),
+              ],
             ),
           ),
 
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
 
-          // 📋 Lista de Lugares (CARDS BLANCOS)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField(
+                    value: filtroDepto,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    items: departamentos
+                        .map((d) => DropdownMenuItem(
+                              value: d,
+                              child: Text(d),
+                            ))
+                        .toList(),
+                    onChanged: (v) {
+                      filtroDepto = v.toString();
+                      _filtrarTodo();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // ------------------------- LISTA -------------------------
           Expanded(
             child: ListView.builder(
-              itemCount: lugaresFiltrados.length,
+              itemCount: _resultados.length,
               itemBuilder: (context, index) {
-                final l = lugaresFiltrados[index];
-                return Card(
-                  color: Colors.white, // FONDO BLANCO
-                  shadowColor: azulAgua.withOpacity(0.3),
-                  elevation: 3,
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  shape: RoundedRectangleBorder(
+                final lugar = _resultados[index];
+
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
                     borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: azulAgua, width: 0.8),
                   ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.agriculture, color: Colors.yellow, size: 40),
+                      const SizedBox(width: 12),
 
-                    leading: const Icon(
-                      Icons.place,
-                      color: azulAgua,
-                      size: 36,
-                    ),
-
-                    title: Text(
-                      l["nombre"],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        color: Colors.black,
-                      ),
-                    ),
-
-                    subtitle: Text(
-                      "${l["ubicacion"]} • ${l["categoria"]}",
-                      style: const TextStyle(color: Colors.black87),
-                    ),
-
-                    trailing: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: verdeHoja,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              lugar['nombre'],
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              "${lugar['departamento']} • ${lugar['pais']}",
+                              style: const TextStyle(color: Colors.white54),
+                            ),
+                          ],
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pop(context, {
-                          "nombre": l["nombre"],
-                          "lat": l["lat"],
-                          "lon": l["lon"],
-                        });
-                      },
-                      child: const Text(
-                        "Ir",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
+
+                      Column(
+                        children: [
+                          _boton(
+                            color: Colors.green,
+                            text: "Ver Ubi",
+                            onTap: () {
+                              Navigator.pop(context, lugar); // ✔ EXACTO COMO ANTES
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          _boton(
+                            color: Colors.blue,
+                            text: "Ver Mapa",
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MapPreviewPage(
+                                    nombre: lugar['nombre'],
+                                    lat: lugar['lat'],
+                                    lon: lugar['lon'],
+                                    departamento: lugar['departamento'],
+                                    pais: lugar['pais'],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      )
+                    ],
                   ),
                 );
               },
@@ -203,6 +225,40 @@ class _FiltracionPageState extends State<FiltracionPage> {
           ),
         ],
       ),
+    );
+  }
+
+  // ------------------------- WIDGET CHIP -------------------------
+  Widget _chip(String label, String selected, Function(String) onTap,
+      {Color colorOn = Colors.black}) {
+    bool activo = selected == label;
+
+    return GestureDetector(
+      onTap: () => onTap(label),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: activo ? colorOn : Colors.black87,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  // ------------------------- BOTÓN -------------------------
+  Widget _boton({required Color color, required String text, required Function() onTap}) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        minimumSize: const Size(90, 36),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      child: Text(text),
     );
   }
 }
